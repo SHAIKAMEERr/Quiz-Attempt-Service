@@ -1,9 +1,9 @@
 package com.example.quiz_attempt_service.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,47 +14,40 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.quiz_attempt_service.dto.QuizAttemptRequestDTO;
 import com.example.quiz_attempt_service.dto.QuizAttemptResponseDTO;
-import com.example.quiz_attempt_service.exception.QuizAttemptException;
+import com.example.quiz_attempt_service.mapper.QuizAttemptMapper;
+import com.example.quiz_attempt_service.model.QuizAttempt;
 import com.example.quiz_attempt_service.service.QuizAttemptService;
 
 @RestController
-@RequestMapping("/api/v1/quiz/attempts")
+@RequestMapping("/api/quiz-attempts")
 public class QuizAttemptController {
-
-    private static final Logger logger = LoggerFactory.getLogger(QuizAttemptController.class);
 
     @Autowired
     private QuizAttemptService quizAttemptService;
+    
+    @Autowired
+    private QuizAttemptMapper quizAttemptMapper;
 
+    // Create a new quiz attempt
     @PostMapping
-    public ResponseEntity<QuizAttemptResponseDTO> attemptQuiz(@RequestBody QuizAttemptRequestDTO quizAttemptRequestDTO) {
-        logger.info("Request received to attempt quiz with quizId: {}", quizAttemptRequestDTO.getQuizId());
-        try {
-            QuizAttemptResponseDTO response = quizAttemptService.attemptQuiz(quizAttemptRequestDTO);
-            logger.info("Quiz attempt created successfully with quizId: {}", quizAttemptRequestDTO.getQuizId());
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } catch (QuizAttemptException e) {
-            logger.error("Error attempting quiz: {}", e.getMessage());
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            logger.error("Unexpected error while attempting quiz: {}", e.getMessage());
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<QuizAttemptResponseDTO> createQuizAttempt(@RequestBody QuizAttemptRequestDTO quizAttemptRequestDTO) {
+        QuizAttemptResponseDTO response = quizAttemptService.createQuizAttempt(quizAttemptRequestDTO);
+        return ResponseEntity.status(201).body(response);
     }
 
-    @GetMapping("/{attemptId}")
-    public ResponseEntity<QuizAttemptResponseDTO> getQuizAttempt(@PathVariable Long attemptId) {
-        logger.info("Request received to get quiz attempt with attemptId: {}", attemptId);
-        try {
-            QuizAttemptResponseDTO response = quizAttemptService.getQuizAttemptById(attemptId);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (QuizAttemptException e) {
-            logger.error("Error fetching quiz attempt: {}", e.getMessage());
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            logger.error("Unexpected error while fetching quiz attempt: {}", e.getMessage());
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @GetMapping("/{id}")
+    public ResponseEntity<QuizAttemptResponseDTO> getQuizAttemptById(@PathVariable Long id) {
+
+    	Optional<QuizAttempt> quizAttemptOptional = quizAttemptService.getQuizAttemptById(id);
+        
+        // Map the entity to DTO if present
+        return quizAttemptOptional
+            .map(quizAttempt -> {
+                // Map the QuizAttempt entity to QuizAttemptResponseDTO using the mapper
+                QuizAttemptResponseDTO responseDTO = quizAttemptMapper.toDTO(quizAttempt);
+                return ResponseEntity.ok(responseDTO);  // Return the DTO wrapped in ResponseEntity
+            })
+            .orElseGet(() -> ResponseEntity.status(404).build());  // If not found, return 404
     }
+
 }
-

@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.example.quiz_attempt_service.listener.event.QuizAttemptEvent;
 import com.example.quiz_attempt_service.model.QuizAttempt;
 import com.example.quiz_attempt_service.service.QuizAttemptService;
 
@@ -21,20 +20,24 @@ public class QuizAttemptListener {
     }
 
     @EventListener
-    public void handleQuizAttemptEvent(QuizAttemptEvent event) {
-    	
-        QuizAttempt quizAttempt = event.getQuizAttempt();
-        
-        logger.info("Received quiz attempt event for QuizAttempt ID: {}",
-        		quizAttempt.getQuizAttemptId());
-        
-        try
-        {
-            quizAttemptService.processQuizAttempt(quizAttempt);     
-        } 
-        catch (Exception e) 
-        {
-            logger.error("Error while processing quiz attempt event: {}", e.getMessage(), e);
+    public void handleQuizAttemptCreationEvent(QuizAttempt quizAttempt) {
+        logger.info("Received quiz attempt creation event: {}", quizAttempt);
+        try {
+            quizAttemptService.startQuizAttempt(quizAttempt);
+            logger.info("Quiz attempt started successfully for ID: {}", quizAttempt.getQuizId());
+        } catch (Exception e) {
+            logger.error("Error handling quiz attempt creation event", e);
+        }
+    }
+
+    @EventListener
+    public void handleQuizAttemptCompletionEvent(QuizAttempt quizAttempt) {
+        logger.info("Received quiz attempt completion event: {}", quizAttempt);
+        try {
+            quizAttemptService.calculateQuizResult(quizAttempt);
+            logger.info("Quiz attempt completed successfully for ID: {}", quizAttempt.getQuizId());
+        } catch (Exception e) {
+            logger.error("Error handling quiz attempt completion event", e);
         }
     }
 }

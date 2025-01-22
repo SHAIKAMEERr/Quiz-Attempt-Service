@@ -18,20 +18,18 @@ public class QuizResultMapper {
             return null;
         }
         return QuizResultDTO.builder()
-                .resultId(quizResult.getQuizResultId()) 
-                .attemptId(quizResult.getAttemptId())
-                .score(quizResult.getScore())
+                .quizResultId(quizResult.getQuizResultId())
+                .quizAttemptId(quizResult.getQuizAttemptId())
+                .totalScore(quizResult.getTotalScore())
                 .totalQuestions(quizResult.getTotalQuestions())
                 .resultStatus(quizResult.getResultStatus())
-                .totalScore(quizResult.getTotalScore())
                 .build();
     }
 
-    public QuizResultDTO toQuizResultDTO(QuizResult quizResult) {
-        return modelMapper.map(quizResult, QuizResultDTO.class);
-    }
-
-    public QuizResult toQuizResult(QuizResultDTO quizResultDTO) {
+    public QuizResult toEntity(QuizResultDTO quizResultDTO) {
+        if (quizResultDTO == null) {
+            return null;
+        }
         return modelMapper.map(quizResultDTO, QuizResult.class);
     }
 }

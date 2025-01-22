@@ -8,22 +8,19 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder 
+@Builder
 public class QuizResultDTO {
 
-    private Long quizResultId; 
+    private Long quizResultId;
     
     private Long quizAttemptId;
     
-    private Integer score;
+    private int totalScore;
     
-    private Integer totalQuestions;
+    private int totalQuestions;
+    
+    private Double percentage;
     
     private String resultStatus;
     
-    private Long resultId;  
-    
-    private Long attemptId;
-    
-    private int totalScore; 
 }

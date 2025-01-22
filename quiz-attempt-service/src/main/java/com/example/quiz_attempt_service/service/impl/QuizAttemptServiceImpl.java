@@ -1,94 +1,65 @@
 package com.example.quiz_attempt_service.service.impl;
 
+import java.util.List;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.example.quiz_attempt_service.dto.QuizAttemptRequestDTO;
 import com.example.quiz_attempt_service.dto.QuizAttemptResponseDTO;
 import com.example.quiz_attempt_service.mapper.QuizAttemptMapper;
 import com.example.quiz_attempt_service.model.QuizAttempt;
 import com.example.quiz_attempt_service.repository.QuizAttemptRepository;
 import com.example.quiz_attempt_service.service.QuizAttemptService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 public class QuizAttemptServiceImpl implements QuizAttemptService {
 
+    @Autowired
+    private QuizAttemptRepository quizAttemptRepository;
+
+    @Autowired
+    private QuizAttemptMapper quizAttemptMapper;
+
     private static final Logger logger = LoggerFactory.getLogger(QuizAttemptServiceImpl.class);
 
-    private final QuizAttemptRepository quizAttemptRepository;
-    private final QuizAttemptMapper quizAttemptMapper;
-    private final ApplicationEventPublisher eventPublisher;
-
-    public QuizAttemptServiceImpl(QuizAttemptRepository quizAttemptRepository,
-                                   QuizAttemptMapper quizAttemptMapper,
-                                   ApplicationEventPublisher eventPublisher) {
-        this.quizAttemptRepository = quizAttemptRepository;
-        this.quizAttemptMapper = quizAttemptMapper;
-        this.eventPublisher = eventPublisher;
-    }
-
     @Override
-    @Transactional
-    public QuizAttemptResponseDTO attemptQuiz(QuizAttemptRequestDTO quizAttemptRequestDTO) {
-        logger.info("Starting quiz attempt with request: {}", quizAttemptRequestDTO);
-        
+    public QuizAttemptResponseDTO createQuizAttempt(QuizAttemptRequestDTO quizAttemptRequestDTO) {
+        logger.info("Creating new quiz attempt for userId: {}", quizAttemptRequestDTO.getUserId());
         QuizAttempt quizAttempt = quizAttemptMapper.toEntity(quizAttemptRequestDTO);
-        
-        quizAttempt = quizAttemptRepository.save(quizAttempt);
-        
-        logger.info("Quiz attempt saved with ID: {}", quizAttempt.getQuizAttemptId());
-        
-        eventPublisher.publishEvent(quizAttempt);
-        logger.info("Published event for quiz attempt ID: {}", quizAttempt.getQuizAttemptId());
-        
-        return quizAttemptMapper.toResponseDTO(quizAttempt);
-    }
-
-
-    @Override
-    public QuizAttemptResponseDTO getQuizAttemptById(Long attemptId) {
-        logger.info("Fetching quiz attempt by ID: {}", attemptId);
-        
-        Optional<QuizAttempt> optionalQuizAttempt = quizAttemptRepository.findById(attemptId);
-        if (optionalQuizAttempt.isEmpty()) {
-        	
-            logger.error("Quiz attempt not found for ID: {}", attemptId);
-            throw new RuntimeException("Quiz attempt not found for ID: " + attemptId);
-        }
-        QuizAttempt quizAttempt = optionalQuizAttempt.get();
-        logger.info("Quiz attempt found for ID: {}", attemptId);
-        
-        return quizAttemptMapper.toResponseDTO(quizAttempt);
+        QuizAttempt savedQuizAttempt = quizAttemptRepository.save(quizAttempt);
+        return quizAttemptMapper.toDTO(savedQuizAttempt);
     }
 
     @Override
-    @Transactional
-    public void deleteQuizAttempt(Long attemptId) {
-    	
-        logger.info("Deleting quiz attempt with ID: {}", attemptId);
-        
-        if (!quizAttemptRepository.existsById(attemptId)) {
-        	
-            logger.error("Quiz attempt not found for ID: {}", attemptId);
-            throw new RuntimeException("Quiz attempt not found for ID: " + attemptId);
-        }
-        quizAttemptRepository.deleteById(attemptId);
-        logger.info("Quiz attempt deleted for ID: {}", attemptId);
+    public Optional<QuizAttemptResponseDTO> getQuizAttemptByUserIdAndQuizId(Long userId, Long quizId) {
+        return quizAttemptRepository.findByUserIdAndQuizId(userId, quizId)
+                .map(quizAttemptMapper::toDTO);
     }
 
     @Override
-    public void processQuizAttempt(QuizAttempt quizAttempt) {
-    	
-        logger.info("Processing quiz attempt with ID: {}", quizAttempt.getQuizAttemptId());
-        
-        quizAttempt.setProcessed(true);
-        
-        quizAttemptRepository.save(quizAttempt);
-        
-        logger.info("Quiz attempt processed and saved for ID: {}", quizAttempt.getQuizAttemptId());
+    public List<QuizAttemptResponseDTO> getQuizAttemptsByUserId(Long userId) {
+        List<QuizAttempt> quizAttempts = quizAttemptRepository.findByUserId(userId);
+        return quizAttemptMapper.toDTOList(quizAttempts);
+    }
+
+    @Override
+    public Optional<QuizAttempt> getQuizAttemptById(Long id) {
+        return quizAttemptRepository.findById(id);
+    }
+
+    @Override
+    public void startQuizAttempt(QuizAttempt quizAttempt) {
+        logger.info("Starting quiz attempt with ID: {}", quizAttempt.getQuizId());
+        // Logic for starting the quiz attempt
+    }
+
+    @Override
+    public void calculateQuizResult(QuizAttempt quizAttempt) {
+        logger.info("Calculating quiz result for quiz attempt with ID: {}", quizAttempt.getQuizId());
+        // Logic for calculating the result
     }
 }

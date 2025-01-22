@@ -2,21 +2,35 @@ package com.example.quiz_attempt_service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
+import java.util.Date;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class QuizAttemptResponseDTO {
-
+	
     private Long quizAttemptId;
-
-    private Long userId;
-
+    
     private Long quizId;
-
-    private String status;  // Example: IN_PROGRESS, COMPLETED, FAILED
-
-    private String message;  // Additional message or error
+    
+    private Long userId;
+    
+    private Date startTime;
+    
+    private Date endTime;
+    
+    private Integer score;
+    
+    private Integer totalQuestions;
+    
+    private String attemptStatus;
+    
+    private Double percentage;  // Add the percentage field
+    
+    private String resultStatus;  // Add the resultStatus field
+    
+    private Double totalTimeTaken;  // Add the totalTimeTaken field
 }
-

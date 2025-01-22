@@ -1,33 +1,36 @@
 package com.example.quiz_attempt_service.validator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.example.quiz_attempt_service.exception.QuizAttemptException;
-import com.example.quiz_attempt_service.model.QuizAttempt;
+import com.example.quiz_attempt_service.dto.QuizAttemptRequestDTO;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class QuizValidator {
 
     private static final Logger logger = LoggerFactory.getLogger(QuizValidator.class);
 
-    public void validateQuizAttempt(QuizAttempt quizAttempt) {
-    	
-        logger.info("Validating quiz attempt with ID: {}", quizAttempt.getQuizAttemptId());
+    // Validate if the QuizAttemptRequestDTO contains valid data
+    public boolean validateQuizAttemptRequest(QuizAttemptRequestDTO quizAttemptRequestDTO) {
+        if (quizAttemptRequestDTO == null) {
+            logger.warn("Quiz attempt request DTO is null.");
+            return false;
+        }
         
-        if (quizAttempt.getQuestions() == null || quizAttempt.getQuestions().isEmpty()) {
-        	
-            logger.error("Quiz attempt must contain at least one question.");
-            
-            throw new QuizAttemptException("Quiz attempt must contain at least one question.");
+        if (quizAttemptRequestDTO.getQuizId() == null || quizAttemptRequestDTO.getQuizId()<=0) {
+            logger.warn("Quiz ID is missing in the request.");
+            return false;
         }
-        if (quizAttempt.getUser() == null) {
-        	
-            logger.error("Quiz attempt must be associated with a valid user.");
-            
-            throw new QuizAttemptException("Quiz attempt must be associated with a valid user.");
+        
+        if (quizAttemptRequestDTO.getUserId() == null || quizAttemptRequestDTO.getUserId()<=0) {
+            logger.warn("User ID is missing in the request.");
+            return false;
         }
-        logger.info("Quiz attempt validated successfully.");
+
+        // Additional validation checks can be added as required
+        logger.info("Quiz attempt request validation passed.");
+        return true;
     }
 }

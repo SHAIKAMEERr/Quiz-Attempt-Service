@@ -1,35 +1,29 @@
 package com.example.quiz_attempt_service.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
 
 @Configuration
-@EnableSwagger2
-public class SwaggerConfig {
-
-    private static final Logger logger = LoggerFactory.getLogger(SwaggerConfig.class);
+public class SwaggerConfig implements WebMvcConfigurer {
 
     @Bean
-    public Docket api() {
-        logger.info("Configuring Swagger documentation for the API.");
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("com.example.quizattemptservice.controller"))
-                .paths(PathSelectors.any())
-                .build()
-                .apiInfo(new ApiInfoBuilder()
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
+                .info(new Info()
                         .title("Quiz Attempt Service API")
-                        .description("API documentation for the Quiz Attempt service")
-                        .version("1.0")
-                        .build());
+                        .description("API documentation for the Quiz Attempt Service")
+                        .version("1.0"));
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/swagger-ui/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/swagger-ui/")
+                .resourceChain(false);
     }
 }
