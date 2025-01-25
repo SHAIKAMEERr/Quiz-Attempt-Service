@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +23,10 @@ public class QuizResult {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "quiz_result_id")
     private Long quizResultId;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_id")  // Ensure this is the correct column for your database
+    private User user;
 
     @Column(name = "quiz_attempt_id")
     private Long quizAttemptId;

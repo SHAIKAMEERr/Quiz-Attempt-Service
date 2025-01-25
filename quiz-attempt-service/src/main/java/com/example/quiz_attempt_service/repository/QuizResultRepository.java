@@ -7,15 +7,20 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.example.quiz_attempt_service.model.QuizResult;
+import com.example.quiz_attempt_service.model.User;
+
 
 @Repository
 public interface QuizResultRepository extends JpaRepository<QuizResult, Long> {
 
     Optional<QuizResult> findByQuizAttemptId(Long quizAttemptId);
 
-    Optional<QuizResult> findByUserIdAndQuizId(Long userId, Long quizId);
+    // Update method to use the 'User' entity instead of userId
+    Optional<QuizResult> findByUserAndQuizResultId(User user, Long quizResultId);  // Changed userId to User entity
 
-    List<QuizResult> findByUserId(Long userId); // Optional addition
-    List<QuizResult> findByResultStatus(String resultStatus); // Optional addition
+    // If 'User' is a related entity, use the 'User' entity
+    List<QuizResult> findByUser(User user);
+
+    // Optional addition for finding by resultStatus
+    List<QuizResult> findByResultStatus(String resultStatus); 
 }
-

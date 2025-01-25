@@ -13,7 +13,7 @@ import com.example.quiz_attempt_service.dto.QuizResultDTO;
 import com.example.quiz_attempt_service.service.QuizResultService;
 
 @RestController
-@RequestMapping("/api/quiz-results")
+@RequestMapping("/api/v1/quiz-results")
 public class QuizResultController {
 
     @Autowired

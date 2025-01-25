@@ -12,7 +12,9 @@ import com.example.quiz_attempt_service.dto.QuizResultDTO;
 import com.example.quiz_attempt_service.mapper.QuizResultMapper;
 import com.example.quiz_attempt_service.model.QuestionAttempt;
 import com.example.quiz_attempt_service.model.QuizResult;
+import com.example.quiz_attempt_service.model.User;
 import com.example.quiz_attempt_service.repository.QuizResultRepository;
+import com.example.quiz_attempt_service.repository.UserRepository;
 import com.example.quiz_attempt_service.service.QuestionAttemptService;
 import com.example.quiz_attempt_service.service.QuizResultService;
 
@@ -30,6 +32,9 @@ public class QuizResultServiceImpl implements QuizResultService {
 
     @Autowired
     private QuestionAttemptService questionAttemptService;
+    
+    @Autowired
+    private UserRepository userRepository;
 
     private static final double PASSING_THRESHOLD = 50.0; // Pass percentage threshold
 
@@ -103,13 +108,22 @@ public class QuizResultServiceImpl implements QuizResultService {
             Long userIdLong = Long.parseLong(userId);
             Long quizIdLong = Long.parseLong(quizId);
 
-            // Call the repository method with the converted Long values
-            return quizResultRepository.findByUserIdAndQuizId(userIdLong, quizIdLong)
-                                       .map(quizResultMapper::toDTO);
+            // Fetch the User entity based on userId
+            Optional<User> userOptional = userRepository.findByUserId(userIdLong);
+            
+            if (userOptional.isPresent()) {
+                // Call the repository method with the User object and quizIdLong
+                return quizResultRepository.findByUserAndQuizResultId(userOptional.get(), quizIdLong)
+                                           .map(quizResultMapper::toDTO);
+            } else {
+                logger.error("User not found with userId: {}", userId);
+                return Optional.empty();
+            }
         } catch (NumberFormatException e) {
             logger.error("Invalid format for userId or quizId. userId: {}, quizId: {}", userId, quizId, e);
             return Optional.empty();
         }
     }
+
 
 }

@@ -15,35 +15,23 @@ import com.example.quiz_attempt_service.dto.QuestionAttemptDTO;
 import com.example.quiz_attempt_service.service.QuestionAttemptService;
 
 @RestController
-@RequestMapping("/api/question-attempts")
+@RequestMapping("/api/v1/question-attempts")
 public class QuestionAttemptController {
 
     @Autowired
     private QuestionAttemptService questionAttemptService;
 
     @PostMapping("/{quizAttemptId}/{questionId}")
-    public ResponseEntity<QuestionAttemptDTO> recordQuestionAttempt(
-            @PathVariable Long quizAttemptId,
-            @PathVariable Long questionId,
-            @RequestBody String userAnswer) {
-
-        QuestionAttemptDTO questionAttemptDTO = questionAttemptService
-        		.recordQuestionAttempt(quizAttemptId, questionId, userAnswer);
-        
+    public ResponseEntity<QuestionAttemptDTO> recordQuestionAttempt(@PathVariable Long quizAttemptId, @PathVariable Long questionId, @RequestBody String userAnswer) {
+        QuestionAttemptDTO questionAttemptDTO = questionAttemptService.recordQuestionAttempt(quizAttemptId, questionId, userAnswer);
         return ResponseEntity.status(201).body(questionAttemptDTO);
     }
 
     @GetMapping("/{quizAttemptId}/{questionId}")
-    public ResponseEntity<QuestionAttemptDTO> getQuestionAttempt(
-            @PathVariable Long quizAttemptId,
-            @PathVariable Long questionId) {
-        
+    public ResponseEntity<QuestionAttemptDTO> getQuestionAttempt(@PathVariable Long quizAttemptId, @PathVariable Long questionId) {
         Optional<QuestionAttemptDTO> questionAttemptOptional = questionAttemptService.getQuestionAttempt(quizAttemptId, questionId);
-        
-        // Check if the Optional contains a value and return the corresponding ResponseEntity
         return questionAttemptOptional
-                .map(questionAttempt -> ResponseEntity.ok(questionAttempt)) // If present, return 200 OK
-                .orElseGet(() -> ResponseEntity.status(404).build()); // If not, return 404 Not Found
+                .map(questionAttempt -> ResponseEntity.ok(questionAttempt))
+                .orElseGet(() -> ResponseEntity.status(404).build());
     }
-
 }

@@ -8,9 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QuizAttemptRequestDTO {
-
+	
     private Long quizId;
     
     private Long userId;
-    
 }

@@ -28,9 +28,9 @@ public class QuizAttemptResponseDTO {
     
     private String attemptStatus;
     
-    private Double percentage;  // Add the percentage field
+    private Double percentage;
     
-    private String resultStatus;  // Add the resultStatus field
+    private String resultStatus;
     
-    private Double totalTimeTaken;  // Add the totalTimeTaken field
+    private Double totalTimeTaken;
 }

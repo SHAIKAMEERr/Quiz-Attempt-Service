@@ -19,17 +19,17 @@ import com.example.quiz_attempt_service.model.QuizAttempt;
 import com.example.quiz_attempt_service.service.QuizAttemptService;
 
 @RestController
-@RequestMapping("/api/quiz-attempts")
+@RequestMapping("/api/v1/quiz-attempts")
 public class QuizAttemptController {
 
     @Autowired
     private QuizAttemptService quizAttemptService;
-    
+
     @Autowired
     private QuizAttemptMapper quizAttemptMapper;
 
     // Create a new quiz attempt
-    @PostMapping
+    @PostMapping("/{quizId}")
     public ResponseEntity<QuizAttemptResponseDTO> createQuizAttempt(@RequestBody QuizAttemptRequestDTO quizAttemptRequestDTO) {
         QuizAttemptResponseDTO response = quizAttemptService.createQuizAttempt(quizAttemptRequestDTO);
         return ResponseEntity.status(201).body(response);
@@ -37,17 +37,12 @@ public class QuizAttemptController {
 
     @GetMapping("/{id}")
     public ResponseEntity<QuizAttemptResponseDTO> getQuizAttemptById(@PathVariable Long id) {
-
-    	Optional<QuizAttempt> quizAttemptOptional = quizAttemptService.getQuizAttemptById(id);
-        
-        // Map the entity to DTO if present
+        Optional<QuizAttempt> quizAttemptOptional = quizAttemptService.getQuizAttemptById(id);
         return quizAttemptOptional
             .map(quizAttempt -> {
-                // Map the QuizAttempt entity to QuizAttemptResponseDTO using the mapper
                 QuizAttemptResponseDTO responseDTO = quizAttemptMapper.toDTO(quizAttempt);
-                return ResponseEntity.ok(responseDTO);  // Return the DTO wrapped in ResponseEntity
+                return ResponseEntity.ok(responseDTO);
             })
-            .orElseGet(() -> ResponseEntity.status(404).build());  // If not found, return 404
+            .orElseGet(() -> ResponseEntity.status(404).build());
     }
-
 }
